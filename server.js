@@ -1,42 +1,35 @@
 import { ApolloServer, gql } from "apollo-server";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
-import { users, quotes } from './fakedb.js';
+import typeDefs from "./schemaGql.js";
+import mongoose from "mongoose";
+import { JWT_SECRET, MONGO_URI } from "./config.js";
 
-const typeDefs = gql`
-    type Query{
-        users:[User] 
-        user(id:ID!):User
-        quotes:[Quote]
-        iquote(by:ID!): [Quote]
-    }
-    type User {
-        id:ID
-        firstName:String
-        lastName:String
-        email:String 
-        quotes:[Quote]
-}
-    type Quote {
-    name: String
-    by :ID
-    }        
-`
+mongoose.connect(MONGO_URI)
 
-const resolvers = {
-    Query: {
-        users: () => users,
-        user: (_, { id }) => users.find(user => user.id == id),
-        quotes: () => quotes,
-        iquote: (_, { by }) => quotes.filter(quote => quote.by == by)
-    },
-    User: {
-        quotes: (ur) => quotes.filter(quote => quote.by == ur.id)
-    }
-}
+mongoose.connection.on("connected", () => {
+    console.log("connected with Database");
+})
+
+mongoose.connection.on("error", (err) => {
+    console.log("error connecting", err);
+})
+
+
+import './models/Quotes.js'
+import './models/User.js'
+import resolvers from "./resolvers.js";
+import { assertUnionType } from "graphql";
 
 const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req }) => {
+        const { authorization } = req.headers;
+        if (authorization) {
+            const { userId } = JWT_SECRET.verify(authorization, JWT_SECRET);
+            return userId
+        }
+    },
     plugins: [
         ApolloServerPluginLandingPageGraphQLPlayground()
     ]
