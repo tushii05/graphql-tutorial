@@ -1,0 +1,442 @@
+{
+	"info": {
+		"_postman_id": "2f056406-9fa6-4977-beee-6258bc84d637",
+		"name": "GraphQl",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25392734"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createUser($userNew:UserInput!){\r\n  user: signupUser(userNew:$userNew){\r\n    _id\r\n    email\r\n    firstName\r\n    lastName\r\n  }\r\n}",
+								"variables": "{\r\n  \"userNew\":{\r\n    \"firstName\":\"Tushar\",\r\n    \"lastName\":\"Deshmukh \",\r\n    \"email\":\"tushar@gmail.com\",\r\n    \"password\":\"Tushar@123\"\r\n  }\r\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is less than 500ms\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response body has the required fields - data, user, and token\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.have.property('data');\r",
+									"    pm.expect(responseData.data).to.have.property('user');\r",
+									"    pm.expect(responseData.data.user).to.have.property('token');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation signinUser($userSignIn:UserSignInInput!){\r\n  user: signinUser(userSignIn:$userSignIn){\r\n    token\r\n  }\r\n}",
+								"variables": "{\r\n  \"userSignIn\": {\r\n    \"email\":\"ramesh@gmail.com\",\r\n    \"password\":\"12345\"\r\n  }\r\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users With Quotes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is within an acceptable range\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.data).to.exist.and.to.be.an('object');\r",
+									"    pm.expect(responseData.data.users).to.exist.and.to.be.an('array');\r",
+									"\r",
+									"    responseData.data.users.forEach(function(user) {\r",
+									"        pm.expect(user._id).to.exist.and.to.be.a('string');\r",
+									"        pm.expect(user.firstName).to.exist.and.to.be.a('string');\r",
+									"        pm.expect(user.lastName).to.exist.and.to.be.a('string');\r",
+									"        pm.expect(user.email).to.exist.and.to.be.a('string');\r",
+									"        \r",
+									"        user.quotes.forEach(function(quote) {\r",
+									"            pm.expect(quote.name).to.exist.and.to.be.a('string');\r",
+									"            pm.expect(quote.by).to.exist.and.to.be.a('string');\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Data properties are non-empty strings\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    \r",
+									"    responseData.data.users.forEach(user => {\r",
+									"        pm.expect(user._id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"        pm.expect(user.firstName).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"        pm.expect(user.lastName).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"        pm.expect(user.email).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Quotes array is present and contains expected number of elements\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData.data.users[0].quotes).to.exist;\r",
+									"  pm.expect(responseData.data.users[0].quotes).to.be.an('array');\r",
+									"  pm.expect(responseData.data.users[0].quotes).to.have.lengthOf.at.least(1);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getAllUsers{\r\n  users {\r\n   _id\r\n    firstName\r\n   lastName\r\n    email\r\n    quotes{\r\n      name\r\n      by\r\n    }\r\n  }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Id with Qoutes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is within an acceptable range\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields - user, _id, firstName, quotes\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.data).to.exist;\r",
+									"    pm.expect(responseData.data.user).to.exist;\r",
+									"    pm.expect(responseData.data.user._id).to.exist;\r",
+									"    pm.expect(responseData.data.user.firstName).to.exist;\r",
+									"    pm.expect(responseData.data.user.quotes).to.exist;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"User object is present and contains expected number of elements\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"\r",
+									"  pm.expect(responseData).to.be.an('object');\r",
+									"  pm.expect(responseData.data.user).to.exist;\r",
+									"  pm.expect(responseData.data.user).to.have.property('_id');\r",
+									"  pm.expect(responseData.data.user).to.have.property('firstName');\r",
+									"  pm.expect(responseData.data.user.quotes).to.be.an('array').that.is.not.empty;\r",
+									"  pm.expect(responseData.data.user.quotes[0]).to.have.property('name');\r",
+									"  pm.expect(responseData.data.user.quotes[0]).to.have.property('by');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Name and by in quotes array must be non-empty strings\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData).to.be.an('object');\r",
+									"  pm.expect(responseData.data).to.be.an('object');\r",
+									"  pm.expect(responseData.data.user).to.be.an('object');\r",
+									"  pm.expect(responseData.data.user.quotes).to.be.an('array');\r",
+									"\r",
+									"  responseData.data.user.quotes.forEach(function(quote) {\r",
+									"    pm.expect(quote.name).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Name should not be empty\");\r",
+									"    pm.expect(quote.by).to.be.a('string').and.to.have.lengthOf.at.least(1, \"By should not be empty\");\r",
+									"  });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getUserById($userid:ID!){\r\n  user(_id:$userid){\r\n    _id\r\n    firstName\r\n    quotes{\r\n      name\r\n      by\r\n    }\r\n  }\r\n}",
+								"variables": "{\r\n  \"userid\": \"676a7dd41c38b745f97e856b\"\r\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Quotes",
+			"item": [
+				{
+					"name": "Get All Qoutes",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getAllQuote {\r\n  quotes {\r\n    name\r\n    by{\r\n      _id\r\n      firstName\r\n    }\r\n  }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Quotes By User Id",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getQuoteById($quoteby:ID!){\r\n  iquote(by:$quoteby){\r\n      name\r\n      by\r\n  }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Qoutes",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzZiYWJjYWJlN2UyNTEzOTY0ZmM3OWMiLCJpYXQiOjE3MzUxMjc0MDJ9.VGH60pOh0KTxLNJQjXZsCj_VCGuviJZe2Ai2B1F8x7E",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createQuote{\r\n  qoute : createQuote(name:\"i am another nice quote\")\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzZhN2RkNDFjMzhiNzQ1Zjk3ZTg1NmIiLCJpYXQiOjE3MzUxMDMzMTV9.b9cDBkKYHl9NU5Lop7mlbg-ifDMWhvl9bK7c-G3u2Cw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateQuote{\r\n update: updateQuote(_id: \"676bddc7d4dc975133faa7c9\", name: \"Updated Quote Name\")\r\n}\r\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Quote ",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzZhN2RkNDFjMzhiNzQ1Zjk3ZTg1NmIiLCJpYXQiOjE3MzUxMDMzMTV9.b9cDBkKYHl9NU5Lop7mlbg-ifDMWhvl9bK7c-G3u2Cw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteQuote{\r\n  deleteQuote(_id: \"676bddc7d4dc975133faa7c9\") \r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

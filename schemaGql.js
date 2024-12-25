@@ -4,9 +4,20 @@ const typeDefs = gql`
     type Query{
         users:[User] 
         user(_id:ID!):User
-        quotes:[Quote]
+        quotes:[QuoteWithName]
         iquote(by:ID!): [Quote]
     }
+
+    type QuoteWithName{
+        name:String
+        by:IdName
+    }
+
+    type IdName{
+        _id:String
+        firstName:String
+    }
+
     type User{
         _id:ID
         firstName:String!
@@ -14,6 +25,7 @@ const typeDefs = gql`
         email:String!
         quotes:[Quote]
     }
+        
     type Quote{
         name: String!
         by :ID!
@@ -22,10 +34,14 @@ const typeDefs = gql`
     type Token{
         token:String
     }
+
     type Mutation{
         signupUser(userNew:UserInput!):User
         signinUser(userSignIn: UserSignInInput!):Token
-        createQuote(name:String):String
+        createQuote(name:String!):String
+        updateQuote(_id: ID!, name: String!): String
+        deleteQuote(_id: ID!): String
+
     }
 
     input UserInput{
@@ -34,7 +50,8 @@ const typeDefs = gql`
         email:String!
         password:String!
     }
-        input UserSignInInput{
+    
+    input UserSignInInput{
             email:String!
             password:String!
     }

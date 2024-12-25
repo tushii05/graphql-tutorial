@@ -1,19 +1,26 @@
 query getAllUsers{
   users {
-		_id
+   _id
     firstName
    lastName
+    email
+    quotes{
+      name
+      by
+    }
   }
 }
-
 ------------------------------------
 
 query getAllQuote {
   quotes {
     name
+    by{
+      _id
+      firstName
+    }
   }
-} 
-
+}
 --------------------------------
 query getAllUsers{
   users {
@@ -29,8 +36,8 @@ query getAllUsers{
 
 ----------------------------
 
-query getUserById{
-  user(_id:"2"){
+query getUserById($userid:ID!){
+  user(_id:$userid){
     _id
     firstName
     quotes{
@@ -58,13 +65,26 @@ query getQuoteById($quoteby:ID!){
       by
   }
 }
-
 ------------------------------
 mutation createUser($userNew:UserInput!){
-  user: signupUserDummy(userNew:$userNew){
+  user: signupUser(userNew:$userNew){
     _id
     email
     firstName
     lastName
   }
+}
+
+------------------------------------
+
+mutation signinUser($userSignIn:UserSignInInput!){
+  user: signinUser(userSignIn:$userSignIn){
+    token
+  }
+}
+
+-------------------------------------
+
+mutation createQuote{
+  qoute : createQuote(name:"i am another nice quote")
 }
