@@ -41,7 +41,6 @@ const typeDefs = gql`
         createQuote(name:String!):String
         updateQuote(_id: ID!, name: String!): String
         deleteQuote(_id: ID!): String
-
     }
 
     input UserInput{
